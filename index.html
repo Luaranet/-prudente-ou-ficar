@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prudente × Ficar</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#f6f6f8;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{width:100%;max-width:430px;background:white;border-radius:28px;padding:25px;box-shadow:0 10px 35px rgba(0,0,0,.10);text-align:center}
+h1{font-size:27px;margin:0 0 7px}.sub{color:#777;margin:0 0 25px}
+.scores{display:flex;gap:12px}.score{flex:1;background:#f1f1f3;border-radius:20px;padding:17px 8px}.score .n{font-size:48px;font-weight:800;margin-top:5px}
+button{width:100%;border:0;border-radius:17px;padding:18px;margin-top:13px;font-size:17px;font-weight:750;touch-action:manipulation}
+.p{background:#ded6ff}.f{background:#cfe3ff}.undo{background:#eeeeef}.reset{background:#fff0f0;color:#9b3030}
+#status{font-weight:700;margin:20px 0 4px;min-height:22px}
+small{display:block;color:#888;margin-top:15px}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>⚖️ Prudente × Ficar</h1>
+<p class="sub">Marque cada vez que algo te fizer pender para um lado.</p>
+
+<div class="scores">
+<div class="score">🎓<br>Ir pra Prudente<div class="n" id="prudente">0</div></div>
+<div class="score">🏠<br>Ficar<div class="n" id="ficar">0</div></div>
+</div>
+
+<div id="status">⚖️ Empate</div>
+
+<button class="p" id="btnP">🎓 Quero ir pra Prudente +1</button>
+<button class="f" id="btnF">🏠 Quero ficar +1</button>
+<button class="undo" id="btnUndo">↩️ Desfazer último ponto</button>
+<button class="reset" id="btnReset">🗑️ Zerar tudo</button>
+<small>Os pontos ficam salvos neste navegador.</small>
+</div>
+
+<script>
+(function(){
+  const KEY="prudente_ficar_v2";
+  let state={p:0,f:0,history:[]};
+  try{state=JSON.parse(localStorage.getItem(KEY))||state}catch(e){}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+  function render(){
+    document.getElementById("prudente").textContent=state.p;
+    document.getElementById("ficar").textContent=state.f;
+    let text="⚖️ Empate";
+    if(state.p>state.f) text="🎓 Prudente está na frente por "+(state.p-state.f)+" ponto"+((state.p-state.f)==1?"":"s");
+    if(state.f>state.p) text="🏠 Ficar está na frente por "+(state.f-state.p)+" ponto"+((state.f-state.p)==1?"":"s");
+    document.getElementById("status").textContent=text;
+  }
+  document.getElementById("btnP").onclick=()=>{state.p++;state.history.push("p");save();render()};
+  document.getElementById("btnF").onclick=()=>{state.f++;state.history.push("f");save();render()};
+  document.getElementById("btnUndo").onclick=()=>{
+    const x=state.history.pop();
+    if(x==="p"&&state.p>0)state.p--;
+    if(x==="f"&&state.f>0)state.f--;
+    save();render();
+  };
+  document.getElementById("btnReset").onclick=()=>{
+    if(confirm("Zerar os pontos?")){state={p:0,f:0,history:[]};save();render()}
+  };
+  render();
+})();
+</script>
+</body>
+</html>
